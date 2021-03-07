@@ -1,49 +1,41 @@
 import React, { useState } from 'react';
 import { Button, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import ContatoInput from './components/ContatoInput';
+import ContatoItem from './components/ContatoItem';
 
 export default function App() {
-  const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [contato, setContato] = useState([]);
+  const [contatos, setContatos] = useState([]);
   const [contador, setContador] = useState(0);
 
-  const adicionarContato = () => {
-    setContato(contato => {
+  const adicionarContato = (nome, telefone) => {
+    setContatos(contatos => {
       setContador(contador + 1);
-      return [{key: contador.toString(), value: `${nome} - ${telefone}`}, ...contato];
+      return [{key: contador.toString(), value: `${nome} - ${telefone}`}, ...contatos];
     })
-    console.log(contato);
+    console.log(contatos);
+  }
+
+  const removerContato = (keyASerRemovida) => {
+    setContatos(contatos => {
+      return contatos.filter((contato) => {
+        return contato.key !== keyASerRemovida;
+      });
+    });
   }
 
   return (
     <View style={estilo.container}>
-      <Text style={estilo.title}>Cadastro de Contatos</Text>
-      <View style={estilo.dados}>
-        <TextInput 
-          style={estilo.input}
-          placeholder="Digite seu nome"
-          onChangeText={texto => {setNome(texto)}}
-        />
-        <TextInput
-          style={estilo.input} 
-          placeholder="Digite seu telefone"
-          onChangeText={texto => {setTelefone(texto)}}
-        />
-      </View>
-      <View>
-        <Button
-          title="Adicionar contato"
-          onPress={adicionarContato}
-        />
-      </View>
+      <ContatoInput onAddContato={adicionarContato}/>
 
       <View style={estilo.lista}>
         <FlatList
-          data={contato}
-          renderItem = { cont => (
-            <View style={estilo.itemNaLista}>
-              <Text>{cont.item.value}</Text>
-            </View>
+          data={contatos}
+          renderItem = { contato => (
+            <ContatoItem 
+              contato={contato.item.value}
+              chave={contato.item.key}
+              onDelete={removerContato}
+            />
           )}
         />
       </View>
@@ -79,15 +71,5 @@ const estilo = StyleSheet.create({
   },
   lista: {
     marginTop: 20
-  },
-  itemNaLista: {
-    padding: 20,    
-    backgroundColor: '#CCC',    
-    borderColor: 'black',    
-    borderWidth: 1,    
-    marginBottom: 20,    
-    borderRadius: 8,    
-    alignItems: 'center',
-    width: 610
   }
 });
